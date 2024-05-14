@@ -1,0 +1,24 @@
+html:has(.page-template-velocityelearning-app) {
+    margin-top: 0 !important;
+}
+.page-template-velocityelearning-app #wpadminbar {
+ display: none !important;
+}
+.cmb2-wrap input.cmb2-text-small, .cmb2-wrap input.cmb2-timepicker {
+    width: 200px !important;
+}
+
+@media(min-width: 768px){
+    .app-menu {
+        width: 15rem;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        padding: .5rem;
+    }
+    .app-main {
+        margin-left: 15rem;
+        min-height: 80vh;
+    }
+}
