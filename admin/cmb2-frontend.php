@@ -56,7 +56,7 @@ class CMB2_Frontend_Form_Bs {
             'post_author'   => $user_id ? $user_id : 1,
             'post_status'   => 'publish',
             'post_type'     => reset( $post_types ),
-            'id_user'       => '',
+            'id_user'       => isset($atts['post_id'])?absint( $atts['post_id'] ):'',
         ), $atts, 'cmb-frontend-form' );
 
         // Initiate our output variable
@@ -139,11 +139,6 @@ class CMB2_Frontend_Form_Bs {
             return $new_submission_id;
         }  
 
-        unset( $sanitized_values['user_login'] );
-        unset( $sanitized_values['user_pass'] );
-        unset( $sanitized_values['user_email'] );
-        unset( $sanitized_values['role'] );
-        unset( $sanitized_values['first_name'] );
         foreach ( $sanitized_values as $key => $value ) {
             update_user_meta( $new_submission_id, $key, $value );
         }

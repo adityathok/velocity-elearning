@@ -12,6 +12,7 @@ class Guru extends Elearning
     public function initialize(){
         add_action( 'init', array($this, 'register_role') );
         add_action( 'cmb2_init', array($this, 'register_cmb2') );
+        add_action( 'wp_ajax_vdelallguru', array($this, 'ajax_vdelallguru') );
     }
     
     public function register_role() {
@@ -137,6 +138,26 @@ class Guru extends Elearning
             'type' => 'select',
             'options' => $this->prodi(),
         ) );
+    }
+
+    public function ajax_vdelallguru(){
+        $data = [];
+
+        $getusers = get_users( 
+            array( 
+                'role__in' => array( 'guru' )
+            ) 
+        );
+        foreach ( $getusers as $user ) {
+            $data[] = [
+                'id'        => $user->ID,
+                'nidn'      => $user->user_login,
+                'nama'      => $user->first_name,
+                'prodi'     => $user->prodi,
+            ];
+        }
+    
+        wp_send_json($data);
     }
 
 }

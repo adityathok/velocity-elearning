@@ -20,8 +20,13 @@ if (!function_exists('velocityel_register_scripts')) {
 			$the_version = $the_version.'.'.time();
 		}
 
+		wp_enqueue_style('dataTables-bootstrap5', VELOCITY_ELEARNING_PLUGIN_URL . 'public/css/dataTables.bootstrap5.css', array(), $the_version, false);
 		wp_enqueue_style('velocityelearning-style', VELOCITY_ELEARNING_PLUGIN_URL . 'public/css/style.css', array(), $the_version, false);
 
+		wp_enqueue_script('dataTables', VELOCITY_ELEARNING_PLUGIN_URL . 'public/js/dataTables.js', array('jquery'), $the_version, true);
+		wp_enqueue_script('dataTables-buttons', VELOCITY_ELEARNING_PLUGIN_URL . 'public/js/dataTables.buttons.js', array('jquery'), $the_version, true);
+		wp_enqueue_script('buttons.dataTables', VELOCITY_ELEARNING_PLUGIN_URL . 'public/js/buttons.dataTables.js', array('jquery'), $the_version, true);
+		wp_enqueue_script('dataTables-bootstrap5', VELOCITY_ELEARNING_PLUGIN_URL . 'public/js/dataTables.bootstrap5.js', array('jquery'), $the_version, true);
 		wp_enqueue_script('velocityelearning-script', VELOCITY_ELEARNING_PLUGIN_URL . 'public/js/script.js', array('jquery','jquery-ui-sortable'), $the_version, true);
 
 		wp_localize_script(

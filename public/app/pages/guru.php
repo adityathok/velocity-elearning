@@ -6,26 +6,67 @@
         </a>
     </div>
     <?php
-    echo do_shortcode( '[cmb-form id="userguru_meta"]' );
+    echo $action=='edit'&&$id?do_shortcode( '[cmb-form id="userguru_meta" post_id='.$id.']' ):do_shortcode( '[cmb-form id="userguru_meta"]' );
     ?>
 <?php else: ?>
-    <div class="text-end mb-2">
-        <a href="<?php echo $permalink.'?pg=guru&act=add' ; ?>" class="btn btn-primary btn-sm">
-            + Tambah Guru
-        </a>
-    </div>
     <div class="table-responsive">
-        <table class="table table-hover table_vdel">
+        <table id="myTable" class="table table-hover table_vdel">
             <thead class="table-light">
                 <tr>
                     <th>NIDN</th>
                     <th>Nama</th>
                     <th>Prodi</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
         </table>
     </div>
+
+    <script>
+        jQuery(function($){
+            jQuery(document).ready(function($) {
+                $('#myTable').DataTable({
+                    ajax: {
+                        url: vdel.ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'vdelallguru'
+                        },
+                        dataType: 'json',
+                        dataSrc: ''
+                    },
+                    columns: [
+                        { data: 'nidn' },
+                        { data: 'nama' },
+                        { data: 'prodi' },
+                        { 
+                            data: 'id',
+                            render: function(data, type, row) {
+                                return '<a href="<?php echo $permalink; ?>?pg=guru&act=edit&id=' + data + '" class="btn btn-link btn-sm" data-id="' + data + '">Edit</a><span class="btn btn-link btn-sm link-danger" data-id="' + data + '">Hapus</span>';
+                            }
+                        }
+                    ],
+                    columnDefs: [
+                        { type: 'string', targets: 0 }
+                    ],
+                    layout: {
+                        topStart: {
+                            buttons: [
+                                {
+                                    text: '+ Tambah Guru',
+                                    className: 'btn btn-sm btn-primary',
+                                    action: function (e, dt, node, config) {
+                                        window.open("<?php echo $permalink.'?pg=guru&act=add' ; ?>","_self")
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 
 <?php endif; ?>

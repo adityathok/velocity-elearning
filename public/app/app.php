@@ -2,6 +2,7 @@
 $permalink  = get_the_permalink();
 $page       = isset($_GET['pg']) ? $_GET['pg'] : '';
 $action     = isset($_GET['act']) ? $_GET['act'] : '';
+$id         = isset($_GET['id']) ? $_GET['id'] : '';
 $pages      = [
     'beranda'       => [
         'title'     => 'Beranda',
