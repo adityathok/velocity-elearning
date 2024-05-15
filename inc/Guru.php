@@ -10,23 +10,33 @@ namespace VelocityElearning;
 class Guru extends Elearning
 {
     public function initialize(){
-        // add role
-        add_role(
-            'guru',
-            __('Guru'),
-            array(
-                'read'              => true, // Allows a user to read
-                'create_posts'      => false, // Allows user to create new posts
-                'edit_posts'        => false, // Allows user to edit their own posts
-                'edit_others_posts' => false, // Allows user to edit others posts too
-                'publish_posts'     => false, // Allows the user to publish posts
-                'manage_categories' => true, // Allows user to manage post categories
-                'upload_files' 		=> true, // Allows user to upload files
-            )
-        );
+        add_action( 'init', array($this, 'register_role') );
         add_action( 'cmb2_init', array($this, 'register_cmb2') );
     }
     
+    public function register_role() {
+        if ( get_option( 'vdel_roleguru_version' ) < 1 ) {
+            add_role(
+                'guru',
+                __('Guru'),
+                array(
+                    'read'              => true, // Allows a user to read
+                    'create_posts'      => false, // Allows user to create new posts
+                    'edit_posts'        => false, // Allows user to edit their own posts
+                    'edit_others_posts' => false, // Allows user to edit others posts too
+                    'publish_posts'     => false, // Allows the user to publish posts
+                    'manage_categories' => true, // Allows user to manage post categories
+                    'upload_files' 		=> true, // Allows user to upload files
+                )
+            );
+            update_option( 'vdel_roleguru_version', 1 );
+        }
+    }
+
+    public function generate_username() {
+        return date('ymdHis');
+    }
+
     public function register_cmb2() {
         $cmb = new_cmb2_box( array(
             'id'           => 'userguru_meta',
@@ -35,29 +45,52 @@ class Guru extends Elearning
         ) );
 
         $cmb->add_field( array(
-            'name' => 'Role',
-            'desc' => '',
-            'id'   => 'role',
-            'type' => 'hidden',
+            'name'    => 'Role',
+            'desc'    => '',
+            'id'      => 'role',
+            'type'    => 'hidden',
             'default' => 'guru',
+            'attributes' => array(
+                'data-validation' => 'required',
+            ),
         ) );
         $cmb->add_field( array(
             'name' => 'NIDN',
             'desc' => 'Ini akan dipakai untuk login username.',
             'id'   => 'user_login',
-            'type' => 'text',
+            'type' => 'text_medium',
+            'default' => $this->generate_username(),
+            'attributes' => array(
+                'data-validation' => 'required',
+            ),
         ) );
         $cmb->add_field( array(
             'name' => 'Password',
             'desc' => 'Password untuk login.',
             'id'   => 'user_pass',
             'type' => 'text_medium',
+            'attributes' => array(
+                'data-validation' => 'required',
+            ),
+        ) );
+        $cmb->add_field( array(
+            'name' => 'Email',
+            'desc' => '',
+            'id'   => 'user_email',
+            'type' => 'text_email',
+            'default' => $this->generate_username().'@'.parse_url(get_site_url())['host'],
+            'attributes' => array(
+                'data-validation' => 'required',
+            ),
         ) );
         $cmb->add_field( array(
             'name' => 'Nama Lengkap',
             'desc' => '',
             'id'   => 'first_name',
             'type' => 'text',
+            'attributes' => array(
+                'data-validation' => 'required',
+            ),
         ) );
         $cmb->add_field( array(
             'name' => 'Tempat Lahir',
@@ -76,7 +109,8 @@ class Guru extends Elearning
             'name' => 'Jenis Kelamin',
             'desc' => '',
             'id'   => 'jenis_kelamin',
-            'type' => 'text',
+            'type' => 'select',
+            'options' => $this->jenis_kelamin(),
         ) );
         $cmb->add_field( array(
             'name' => 'Agama',

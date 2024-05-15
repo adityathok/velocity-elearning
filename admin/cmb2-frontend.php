@@ -56,24 +56,25 @@ class CMB2_Frontend_Form_Bs {
             'post_author'   => $user_id ? $user_id : 1,
             'post_status'   => 'publish',
             'post_type'     => reset( $post_types ),
+            'id_user'       => '',
         ), $atts, 'cmb-frontend-form' );
 
         // Initiate our output variable
         $output = '';
         
-        $new_id = $post_types='user'?$this->handle_user_submit( $cmb, $atts ):$this->handle_submit( $cmb, $atts );
+        $new_result = $post_types='user'?$this->handle_user_submit( $cmb, $atts ):$this->handle_submit( $cmb, $atts );
 
-        if ( $new_id ) {
+        if ( $new_result ) {
 
-            if ( is_wp_error( $new_id ) ) {
+            if ( is_wp_error( $new_result['id'] ) ) {
 
                 // If there was an error with the submission, add it to our ouput.
-                $output .= '<div class="alert alert-warning">' . sprintf( __( 'There was an error in the submission: %s', 'cmb2-post-submit' ), '<strong>'. $new_id->get_error_message() .'</strong>' ) . '</div>';
+                $output .= '<div class="alert alert-warning">' . sprintf( __( 'There was an error in the submission: %s', 'cmb2-post-submit' ), '<strong>'. $new_result['id']->get_error_message() .'</strong>' ) . '</div>';
 
             } else {
 
                 // Add notice of submission
-                $output .= '<div class="alert alert-success">' . sprintf( __( '<strong>%s</strong>, submitted successfully.', 'cmb2-post-submit' ), esc_html( get_the_title($new_id) ) ) . '</div>';
+                $output .= '<div class="alert alert-success">' . sprintf( __( '<strong>%s</strong>, submitted successfully.', 'cmb2-post-submit' ), esc_html( $new_result['title'] ) ) . '</div>';
             }
 
         }
@@ -121,7 +122,36 @@ class CMB2_Frontend_Form_Bs {
         // Fetch sanitized values
         $sanitized_values = $cmb->get_sanitized_values( $_POST );
 
-        print_r($_POST);
+        $userdata = array(
+            'user_login'    => $sanitized_values['user_login'],
+            'user_pass'     => $sanitized_values['user_pass'],
+            'user_email'    => $sanitized_values['user_email'],
+            'role'          => $sanitized_values['role'],   
+            'first_name'    => $sanitized_values['first_name'], 
+            'display_name'  => $sanitized_values['first_name'],
+        );
+        if($post_data['id_user']){
+            $userdata['ID'] = $post_data['id_user']; 
+        }
+        $new_submission_id = wp_insert_user( $userdata ) ; 
+
+        if(is_wp_error($new_submission_id)){
+            return $new_submission_id;
+        }  
+
+        unset( $sanitized_values['user_login'] );
+        unset( $sanitized_values['user_pass'] );
+        unset( $sanitized_values['user_email'] );
+        unset( $sanitized_values['role'] );
+        unset( $sanitized_values['first_name'] );
+        foreach ( $sanitized_values as $key => $value ) {
+            update_user_meta( $new_submission_id, $key, $value );
+        }
+
+        return [
+            'id'    => $new_submission_id,
+            'title' => get_userdata($new_submission_id)->first_name,
+        ];
 
     }
 
@@ -158,7 +188,10 @@ class CMB2_Frontend_Form_Bs {
             update_post_meta( $new_submission_id, $key, $value );
         }
 
-        return $new_submission_id;
+        return [
+            'id'    => $new_submission_id,
+            'title' => get_the_title($new_submission_id),
+        ];
 
     }
 
